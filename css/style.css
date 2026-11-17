@@ -1,0 +1,2022 @@
+/* =============================================================
+   Vishesh Jain | Personal resume website
+   -------------------------------------------------------------
+   Design: a business ledger meets the browser.
+   Cloth-bound red, ledger paper, fountain-pen blue and a marigold
+   highlighter, with dates kept in a ledger-style margin column.
+
+   Contents
+    1. Design tokens
+    2. Base element styles
+    3. Utilities
+    4. Ticker bar
+    5. Header and navigation
+    6. Buttons and links
+    7. Home: hero and ledger
+    8. Home: totals
+    9. Home: experience areas (with CSS-drawn icons)
+   10. Call-to-action band
+   11. Inner page masthead
+   12. About
+   13. Education
+   14. Experience
+   15. Projects
+   16. Skills tabs (CSS only, no JavaScript)
+   17. Contact
+   18. Carried-forward link and footer
+   19. Responsive rules
+   20. Motion preferences
+   ============================================================= */
+
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  /* colour */
+  --red: #9E1B22;          /* ledger-cover red */
+  --red-deep: #7C141A;
+  --paper: #F3ECD2;        /* ledger paper: page background */
+  --paper-deep: #E7DCB8;
+  --sheet: #FCF8EA;        /* lighter sheets laid on the paper */
+  --ink: #1D1B18;          /* black ink */
+  --ink-soft: #5A5246;
+  --blue: #1F3A93;         /* fountain-pen blue: notes and rules */
+  --rule: rgba(31, 58, 147, 0.22);
+  --margin-red: rgba(158, 27, 34, 0.65);
+  --marigold: #F2B21B;     /* highlighter */
+  --cream: #FBF4E2;        /* text on red */
+
+  /* type */
+  --font-display: "Bricolage Grotesque", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-hand: "Kalam", "Segoe Print", "Bradley Hand", cursive;
+
+  /* the woven cloth texture, built only from gradients */
+  --cloth:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.045) 0 2px, transparent 2px 7px);
+
+  /* depth: hard, printed shadows instead of soft blur */
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-small: 4px 4px 0 var(--ink);
+
+  --page-width: 74rem;
+  --space-section: clamp(4rem, 9vw, 7rem);
+}
+
+
+/* ---------- 2. Base element styles ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h3 {
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+p {
+  margin: 0 0 1em;
+  max-width: 62ch;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+figure {
+  margin: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--red);
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+
+/* ---------- 3. Utilities ---------- */
+.wrap {
+  width: min(100% - 2.5rem, var(--page-width));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--space-section);
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.section-title {
+  font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+  font-stretch: 75%;
+}
+
+.hand-heading {
+  font-family: var(--font-hand);
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.hand-note {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  line-height: 1.3;
+  color: var(--blue);
+  rotate: -2deg;
+}
+
+/* highlighter stroke behind a phrase */
+.mark {
+  padding-inline: 0.12em;
+  background: linear-gradient(transparent 52%, rgba(242, 178, 27, 0.75) 52%, rgba(242, 178, 27, 0.75) 92%, transparent 92%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  top: -4rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--ink);
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+
+/* ---------- 4. Ticker bar ---------- */
+.ticker {
+  display: flex;
+  align-items: center;
+  height: 2.6rem;
+  overflow: hidden;
+  background-color: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+}
+
+.ticker-window {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+}
+
+/* two identical lists side by side; sliding by half loops seamlessly */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 55s linear infinite;
+}
+
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.ticker-track ul {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.ticker-track li {
+  white-space: nowrap;
+  color: rgba(251, 244, 226, 0.82);
+}
+
+.ticker-track li::after {
+  content: "✦";
+  margin-inline: 1.1rem;
+  color: var(--marigold);
+}
+
+@keyframes ticker {
+  to { transform: translateX(-50%); }
+}
+
+
+/* ---------- 5. Header and navigation ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--paper);
+  border-bottom: 2px solid var(--ink);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 4.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-right: auto;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--ink);
+}
+
+/* the monogram is pressed like a seal */
+.seal {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+  background: var(--red);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 var(--ink);
+  rotate: -6deg;
+  transition: rotate 0.2s ease;
+}
+
+.brand:hover .seal {
+  rotate: 0deg;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  font-stretch: 85%;
+  letter-spacing: -0.01em;
+}
+
+.main-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem;
+}
+
+.main-nav a {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  padding: 0.45rem 0.7rem;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* a marigold highlighter stroke marks the current page */
+.main-nav a::before {
+  content: "";
+  position: absolute;
+  inset: 0.45rem 0.25rem 0.35rem;
+  z-index: -1;
+  border-radius: 3px 9px 4px 10px;
+  background: var(--marigold);
+  rotate: -2deg;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.main-nav a:hover {
+  color: var(--ink);
+}
+
+.main-nav a:hover::before {
+  opacity: 0.45;
+  transform: scaleX(1);
+}
+
+.main-nav a[aria-current="page"]::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+
+/* ---------- 6. Buttons and links ---------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.35rem;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--shadow-small);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.button-red {
+  background-color: var(--red);
+  color: var(--cream);
+}
+
+.button-red:hover {
+  color: var(--cream);
+}
+
+.button-marigold {
+  background-color: var(--marigold);
+  color: var(--ink);
+}
+
+.button-marigold:hover {
+  color: var(--ink);
+}
+
+.button-paper {
+  background-color: var(--sheet);
+  color: var(--ink);
+}
+
+.button-paper:hover {
+  color: var(--ink);
+}
+
+.button-small {
+  padding: 0.6rem 0.95rem;
+  font-size: 0.92rem;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.text-link {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.02rem;
+}
+
+
+/* ---------- 7. Home: hero and ledger ---------- */
+.hero {
+  padding-block: clamp(2.75rem, 6vw, 5rem) clamp(4rem, 8vw, 6.5rem);
+  overflow: hidden;
+  background-color: var(--red);
+  background-image: var(--cloth);
+  color: var(--cream);
+  border-bottom: 2px solid var(--ink);
+}
+
+.hero :focus-visible,
+.masthead :focus-visible,
+.talk-shop :focus-visible {
+  outline-color: var(--marigold);
+}
+
+.hero-hello {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-hand);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  color: var(--marigold);
+  rotate: -3deg;
+  transform-origin: left center;
+}
+
+.hero-name {
+  margin-bottom: 1.75rem;
+  font-size: clamp(4.5rem, 9vw, 8.5rem);
+  font-stretch: 75%;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: var(--cream);
+}
+
+.hero-name span {
+  display: block;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.hero .ledger {
+  margin-top: clamp(1rem, 4vw, 3.5rem);
+}
+
+.hero-hook {
+  max-width: 17ch;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.85rem, 3.8vw, 3rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.02;
+  color: var(--marigold);
+}
+
+.hero-intro p:not(.hero-hook) {
+  max-width: 36ch;
+  font-size: 1.3rem;
+  line-height: 1.5;
+}
+
+/* the open ledger page */
+.ledger {
+  position: relative;
+  padding: 1.6rem 1.6rem 1.4rem;
+  background-color: var(--sheet);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 10px 10px 0 var(--ink);
+  rotate: 1.5deg;
+}
+
+/* a strip of marigold tape holding the page down */
+.ledger::before {
+  content: "";
+  position: absolute;
+  top: -0.9rem;
+  left: 50%;
+  width: 7rem;
+  height: 1.6rem;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: rgba(242, 178, 27, 0.85);
+  border: 1px solid rgba(29, 27, 24, 0.2);
+}
+
+.ledger-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  font-family: var(--font-hand);
+  font-size: 1.65rem;
+  line-height: 1.2;
+  color: var(--blue);
+}
+
+.ledger-title small {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.ledger-table th {
+  padding: 0.35rem 0.7rem;
+  border-bottom: 2px solid var(--ink);
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.ledger-table td {
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.05rem;
+  line-height: 1.35;
+  vertical-align: top;
+}
+
+/* the date column, closed off by a double red margin line */
+.ledger-table th:first-child,
+.ledger-table td:first-child {
+  width: 5.4rem;
+  border-right: 3px double var(--margin-red);
+}
+
+.ledger-table td:first-child {
+  color: var(--red);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger-foot {
+  margin: 1.1rem 0 0;
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  color: var(--blue);
+}
+
+/* accounting convention: a total is double-underlined */
+.ledger-foot a {
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 4px double var(--blue);
+}
+
+.ledger-foot a:hover {
+  color: var(--red);
+  border-bottom-color: var(--red);
+}
+
+/* entries are "written in" one after another on page load */
+.ledger-table tbody td {
+  animation: write-in 0.55s ease-out both;
+}
+
+.ledger-table tbody tr:nth-child(1) td { animation-delay: 0.3s; }
+.ledger-table tbody tr:nth-child(2) td { animation-delay: 0.65s; }
+.ledger-table tbody tr:nth-child(3) td { animation-delay: 1s; }
+.ledger-table tbody tr:nth-child(4) td { animation-delay: 1.35s; }
+.ledger-table tbody tr:nth-child(5) td { animation-delay: 1.7s; }
+
+.ledger-foot {
+  animation: write-in 0.6s ease-out 2.1s both;
+}
+
+@keyframes write-in {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+
+/* ---------- 8. Home: totals ---------- */
+.totals {
+  padding-block: clamp(3rem, 6vw, 4.5rem);
+  border-bottom: 2px solid var(--ink);
+}
+
+.totals .hand-heading {
+  margin-bottom: 1.75rem;
+}
+
+.totals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.totals-grid li {
+  padding-inline: 1.5rem;
+  border-left: 1px solid var(--rule);
+}
+
+.totals-grid li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.figure {
+  display: inline-block;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.1rem;
+  border-bottom: 6px double var(--ink);
+  color: var(--red);
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 6vw, 5rem);
+  font-stretch: 75%;
+  font-weight: 800;
+  line-height: 0.9;
+}
+
+.figure-label {
+  display: block;
+  max-width: 22ch;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+
+/* ---------- 9. Home: experience areas ---------- */
+.places {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.place {
+  padding: 2.25rem 2rem 2.5rem;
+  border-left: 2px solid var(--ink);
+}
+
+.place:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.place:last-child {
+  padding-right: 0;
+}
+
+.place h3 {
+  margin: 1.5rem 0 0.8rem;
+  font-size: 2rem;
+  font-stretch: 80%;
+}
+
+.place p {
+  font-size: 1.1rem;
+}
+
+/* Icons drawn with CSS only: no image files */
+.icon {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+  flex-shrink: 0;
+}
+
+/* a ring with a stone: the family jewellery business */
+.icon-ring::before {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.2rem;
+  left: 0.7rem;
+  height: 3rem;
+  border: 5px solid var(--marigold);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--ink), inset 0 0 0 2px var(--ink);
+}
+
+.icon-ring::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  left: 50%;
+  width: 1.55rem;
+  height: 1.55rem;
+  translate: -50% 0;
+  rotate: 45deg;
+  background: var(--red);
+  border: 2px solid var(--ink);
+}
+
+/* a browser window: web and digital work */
+.icon-browser::before {
+  content: "";
+  position: absolute;
+  inset: 0.6rem 0 0.4rem;
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+  background:
+    linear-gradient(var(--marigold), var(--marigold)) 0.6rem 1.6rem / 45% 0.35rem no-repeat,
+    linear-gradient(var(--rule), var(--rule)) 0.6rem 2.25rem / 70% 0.3rem no-repeat,
+    linear-gradient(var(--blue) 0 0.9rem, var(--sheet) 0.9rem);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.icon-browser::after {
+  content: "";
+  position: absolute;
+  top: 0.95rem;
+  left: 0.45rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--marigold);
+  box-shadow: 0.55rem 0 0 var(--cream), 1.1rem 0 0 var(--cream);
+}
+
+/* a spotlight on a stage: leadership at the fest */
+.icon-spot {
+  border-bottom: 3px solid var(--ink);
+}
+
+.icon-spot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  width: 1.4rem;
+  height: 1.1rem;
+  translate: -50% 0;
+  border-radius: 4px 4px 2px 2px;
+  background: var(--ink);
+}
+
+.icon-spot::after {
+  content: "";
+  position: absolute;
+  top: 0.9rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(rgba(242, 178, 27, 1), rgba(242, 178, 27, 0.35));
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+}
+
+
+/* ---------- 10. Call-to-action band ---------- */
+.talk-shop {
+  padding-block: var(--space-section);
+  background-color: var(--red);
+  background-image: var(--cloth);
+  color: var(--cream);
+}
+
+.talk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 2rem 4rem;
+  align-items: end;
+}
+
+.talk-shop h2 {
+  font-size: clamp(3.75rem, 10vw, 8.5rem);
+  font-stretch: 75%;
+  line-height: 0.82;
+  color: var(--cream);
+}
+
+.talk-shop p {
+  font-size: 1.3rem;
+}
+
+.talk-shop .button-row {
+  margin-top: 0.5rem;
+}
+
+
+/* ---------- 11. Inner page masthead ---------- */
+.masthead {
+  position: relative;
+  padding-block: clamp(2.75rem, 6vw, 4.75rem) clamp(3.75rem, 7vw, 5.5rem);
+  background-color: var(--red);
+  background-image: var(--cloth);
+  color: var(--cream);
+  border-bottom: 2px solid var(--ink);
+}
+
+/* a stitched binding along the bottom edge */
+.masthead::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 1rem;
+  left: 0;
+  border-bottom: 3px dashed rgba(242, 178, 27, 0.75);
+}
+
+.folio {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  color: var(--marigold);
+  rotate: -2deg;
+  transform-origin: left center;
+}
+
+.masthead h1 {
+  font-size: clamp(3.75rem, 11vw, 9rem);
+  font-stretch: 75%;
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+}
+
+.masthead-lede {
+  max-width: 44ch;
+  margin: 1.5rem 0 0;
+  font-size: 1.35rem;
+  line-height: 1.5;
+}
+
+
+/* ---------- 12. About ---------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.lead {
+  margin-bottom: 2.5rem;
+  font-size: clamp(1.5rem, 2.6vw, 1.95rem);
+  line-height: 1.35;
+}
+
+.story {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0 1.75rem;
+  padding-top: 2.25rem;
+  margin-top: 2.25rem;
+  border-top: 2px solid var(--ink);
+}
+
+.story h2 {
+  margin: 0.4rem 0 1rem;
+  font-size: clamp(2rem, 3.6vw, 2.75rem);
+  font-stretch: 80%;
+}
+
+/* the index card, with a ledger's double red margin line */
+.index-card {
+  position: sticky;
+  top: 7rem;
+  padding: 1.6rem 1.6rem 1.8rem 3.6rem;
+  background-color: var(--sheet);
+  background-image: linear-gradient(to right,
+    transparent 2.4rem,
+    var(--margin-red) 2.4rem, var(--margin-red) calc(2.4rem + 1px),
+    transparent calc(2.4rem + 1px), transparent calc(2.4rem + 4px),
+    var(--margin-red) calc(2.4rem + 4px), var(--margin-red) calc(2.4rem + 5px),
+    transparent calc(2.4rem + 5px));
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+  rotate: -1deg;
+}
+
+.index-card .hand-heading {
+  margin-bottom: 1rem;
+}
+
+.glance {
+  margin: 0 0 1.75rem;
+}
+
+.glance div {
+  padding-block: 0.8rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.glance dt {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.glance dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+}
+
+.tags li {
+  padding: 0.15rem 0.65rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.tags li:nth-child(odd) {
+  background: var(--marigold);
+}
+
+
+/* ---------- 13. Education ---------- */
+/* a small chart: two programmes running at the same time */
+.overlap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 0.9rem;
+  padding: 2rem 2rem 1.75rem;
+  background-color: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.overlap-axis {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr 1fr;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--ink);
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.overlap-axis span {
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--ink);
+}
+
+.overlap-axis span:last-child {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 0.5rem 0 0;
+  border-left: 0;
+  border-right: 2px solid var(--ink);
+}
+
+.bar {
+  max-width: none;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-left: 6px solid var(--ink);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* both bars run right up to "now" */
+.bar-hinduja {
+  grid-column: 1 / 3;
+  background-color: var(--blue);
+}
+
+.bar-iimb {
+  grid-column: 2 / 3;
+  background-color: var(--red);
+}
+
+.overlap-bracket {
+  grid-column: 2 / 3;
+  height: 0.8rem;
+  border: 2px solid var(--blue);
+  border-top: 0;
+}
+
+.overlap-note {
+  grid-column: 2 / 3;
+  justify-self: center;
+}
+
+.record-title {
+  margin: clamp(4rem, 8vw, 6rem) 0 2rem;
+}
+
+.record {
+  background-color: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.record th {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 2px solid var(--ink);
+  background-color: var(--paper-deep);
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.2rem;
+  font-weight: 400;
+  text-align: left;
+}
+
+.record td {
+  padding: 1.1rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.08rem;
+  line-height: 1.4;
+  vertical-align: top;
+}
+
+.record tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.record th:first-child,
+.record td:first-child {
+  border-right: 3px double var(--margin-red);
+}
+
+.record td:first-child {
+  color: var(--red);
+  font-family: var(--font-display);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.record strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+
+/* ---------- 14. Experience ---------- */
+.account {
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  background-color: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.account + .account {
+  margin-top: 3.5rem;
+}
+
+.account-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.account-head h2 {
+  font-size: clamp(2.5rem, 5.5vw, 4rem);
+  font-stretch: 75%;
+}
+
+.account-sub {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+}
+
+.account-no {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  color: var(--blue);
+  rotate: -2deg;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.meta-grid div {
+  padding: 1rem 1.1rem 1.1rem;
+  border-left: 1px solid var(--rule);
+}
+
+.meta-grid div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.meta-grid dt {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  color: var(--blue);
+}
+
+.meta-grid dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* each entry is ticked off in pen */
+.entries {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+}
+
+.entries li {
+  position: relative;
+  max-width: 68ch;
+  padding-left: 2.25rem;
+}
+
+.entries li::before {
+  content: "✓";
+  position: absolute;
+  top: -0.15rem;
+  left: 0;
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+
+/* ---------- 15. Projects ---------- */
+.case {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.75rem, 4vw, 3rem);
+  background-color: var(--ink);
+  color: var(--cream);
+  border: 2px solid var(--ink);
+  box-shadow: 10px 10px 0 var(--red);
+}
+
+.case :focus-visible {
+  outline-color: var(--marigold);
+}
+
+.case-type {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  color: var(--marigold);
+  rotate: -2deg;
+  transform-origin: left center;
+}
+
+.case h2 {
+  font-size: clamp(2.75rem, 6vw, 4.75rem);
+  font-stretch: 75%;
+  line-height: 0.88;
+}
+
+.case-summary {
+  margin-top: 1.25rem;
+  color: rgba(251, 244, 226, 0.85);
+}
+
+.case-parts {
+  margin: 2rem 0 0;
+}
+
+.case-parts div {
+  padding-block: 1rem;
+  border-top: 1px solid rgba(251, 244, 226, 0.2);
+}
+
+.case-parts dt {
+  color: var(--marigold);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.case-parts dd {
+  margin: 0.25rem 0 0;
+  color: rgba(251, 244, 226, 0.85);
+}
+
+.case-visual {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1.25rem;
+  min-height: 20rem;
+  padding: 2rem;
+  border: 1.5px dashed rgba(251, 244, 226, 0.35);
+}
+
+/* a faceted gem: one element, a clip-path outline and a conic gradient */
+.gem {
+  width: min(15rem, 85%);
+  aspect-ratio: 1 / 0.82;
+  clip-path: polygon(22% 0, 78% 0, 100% 30%, 50% 100%, 0 30%);
+  background:
+    linear-gradient(rgba(29, 27, 24, 0.55), rgba(29, 27, 24, 0.55)) 0 30% / 100% 2px no-repeat,
+    conic-gradient(from 200deg at 50% 30%,
+      #FBE7A8 0 8%, #F2B21B 8% 17%, #D9940C 17% 26%, #F7D774 26% 34%,
+      #B97A06 34% 42%, #F2B21B 42% 50%, #FBE7A8 50% 58%, #D9940C 58% 67%,
+      #F7D774 67% 75%, #B97A06 75% 84%, #F2B21B 84% 92%, #FBE7A8 92% 100%);
+  animation: glint 6s ease-in-out infinite;
+}
+
+@keyframes glint {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.15); }
+}
+
+.case-visual .hand-note {
+  color: var(--marigold);
+}
+
+.wins-title {
+  margin: clamp(4rem, 8vw, 6rem) 0 2.5rem;
+}
+
+.wins {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.win {
+  position: relative;
+  padding: 2rem 9.5rem 2.25rem 2rem;
+  background-color: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.win h3 {
+  margin: 0.5rem 0 0.9rem;
+  font-size: clamp(1.9rem, 3.2vw, 2.4rem);
+  font-stretch: 80%;
+}
+
+.win p:last-child {
+  margin-bottom: 0;
+}
+
+/* a rubber stamp in red ink */
+.stamp {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 7rem;
+  height: 7rem;
+  border: 3px solid var(--red);
+  border-radius: 50%;
+  outline: 1.5px solid var(--red);
+  outline-offset: 3px;
+  color: var(--red);
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  text-align: center;
+  line-height: 0.9;
+  rotate: -12deg;
+  opacity: 0.9;
+}
+
+.stamp strong {
+  font-size: 2.6rem;
+  font-weight: 800;
+}
+
+.stamp span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.tickets .hand-heading {
+  margin-bottom: 1.25rem;
+}
+
+.ticket-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* an entry pass with a torn-off stub */
+.ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5.5rem;
+  background-color: var(--marigold);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: var(--shadow-small);
+  rotate: -0.8deg;
+}
+
+.ticket:nth-child(2) {
+  background-color: var(--sheet);
+  rotate: 0.8deg;
+}
+
+.ticket-body {
+  padding: 1.1rem 1.3rem 1.2rem;
+}
+
+.ticket-body h3 {
+  font-size: 1.55rem;
+  font-stretch: 80%;
+}
+
+.ticket-body p {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.ticket-stub {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border-left: 2px dashed var(--ink);
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+}
+
+/* the two notches where the stub tears off */
+.ticket::before,
+.ticket::after {
+  content: "";
+  position: absolute;
+  right: calc(5.5rem - 0.75rem - 1px);
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.ticket::before {
+  top: -0.85rem;
+  clip-path: inset(50% 0 0 0);
+}
+
+.ticket::after {
+  bottom: -0.85rem;
+  clip-path: inset(0 0 50% 0);
+}
+
+
+/* ---------- 16. Skills tabs (CSS only) ---------- */
+/* The radio buttons are hidden but still focusable; each label
+   switches a radio, and the :checked radio shows its panel. */
+.tab-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tab-labels {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-bottom: -2px;
+}
+
+.tab-labels label {
+  padding: 0.75rem 1.2rem;
+  border: 2px solid var(--ink);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background-color: var(--paper-deep);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab-labels label:hover {
+  background-color: #EFE4BF;
+}
+
+.tab-panel {
+  display: none;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background-color: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+#tab-tech:checked ~ .tab-panels #panel-tech,
+#tab-creative:checked ~ .tab-panels #panel-creative,
+#tab-business:checked ~ .tab-panels #panel-business,
+#tab-pro:checked ~ .tab-panels #panel-pro {
+  display: grid;
+}
+
+#tab-tech:checked ~ .tab-labels label[for="tab-tech"],
+#tab-creative:checked ~ .tab-labels label[for="tab-creative"],
+#tab-business:checked ~ .tab-labels label[for="tab-business"],
+#tab-pro:checked ~ .tab-labels label[for="tab-pro"] {
+  padding-bottom: calc(0.95rem + 2px);
+  background-color: var(--sheet);
+}
+
+#tab-tech:focus-visible ~ .tab-labels label[for="tab-tech"],
+#tab-creative:focus-visible ~ .tab-labels label[for="tab-creative"],
+#tab-business:focus-visible ~ .tab-labels label[for="tab-business"],
+#tab-pro:focus-visible ~ .tab-labels label[for="tab-pro"] {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.tab-panel h2 {
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  font-stretch: 75%;
+}
+
+.shows-up {
+  margin-top: 1.75rem;
+  padding: 1rem 1.2rem;
+  border-left: 5px solid var(--marigold);
+  background-color: rgba(242, 178, 27, 0.14);
+}
+
+.shows-up span {
+  display: block;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  color: var(--blue);
+}
+
+.skill-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 0.85rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  font-stretch: 85%;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.skill-list li:first-child {
+  padding-top: 0;
+}
+
+.skill-list li::before {
+  content: "✓";
+  flex-shrink: 0;
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+}
+
+.skills-foot {
+  margin-top: 2.5rem;
+}
+
+
+/* ---------- 17. Contact ---------- */
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.email-big {
+  display: inline-block;
+  margin: 0.5rem 0 2.5rem;
+  padding-inline: 0.1em;
+  background: linear-gradient(transparent 55%, var(--marigold) 55%, var(--marigold) 92%, transparent 92%);
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.5vw, 3.1rem);
+  font-stretch: 75%;
+  font-weight: 800;
+  line-height: 1.05;
+  text-decoration: none;
+}
+
+.email-big:hover {
+  color: var(--red);
+}
+
+.contact-list {
+  margin: 0 0 2rem;
+  border-top: 2px solid var(--ink);
+}
+
+.contact-list div {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.contact-list dt {
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  color: var(--blue);
+}
+
+.contact-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* the message form, laid out like a paper slip */
+.slip {
+  padding: 2rem 2rem 2.25rem;
+  background-color: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow);
+  rotate: 0.8deg;
+}
+
+.slip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px dashed var(--ink);
+}
+
+.slip-head h2 {
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.slip-no {
+  margin: 0;
+  color: var(--red);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 1.4rem;
+}
+
+.field label {
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 0.35rem 0.2rem;
+  border: 0;
+  border-bottom: 2px solid var(--ink);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.15rem;
+}
+
+/* the message box is ruled like ledger paper */
+.field textarea {
+  min-height: 8.5rem;
+  padding: 0 0.2rem;
+  border-bottom: 0;
+  line-height: 2.1rem;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2.1rem - 1px), var(--ink) calc(2.1rem - 1px), var(--ink) 2.1rem);
+  background-attachment: local;
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  background-color: rgba(242, 178, 27, 0.22);
+  border-bottom-color: var(--blue);
+}
+
+.form-hint {
+  margin: 0.9rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+}
+
+
+/* ---------- 18. Carried-forward link and footer ---------- */
+.carry {
+  border-top: 2px solid var(--ink);
+}
+
+.carry a {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.carry-label {
+  color: var(--blue);
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+}
+
+.carry-name {
+  padding-inline: 0.05em;
+  background: linear-gradient(var(--marigold), var(--marigold)) 0 88% / 0% 32% no-repeat;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-stretch: 75%;
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  transition: background-size 0.35s ease;
+}
+
+.carry a:hover .carry-name,
+.carry a:focus-visible .carry-name {
+  background-size: 100% 32%;
+}
+
+.site-footer {
+  padding-block: 3.5rem 2rem;
+  background-color: var(--ink);
+  color: rgba(251, 244, 226, 0.75);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.site-footer :focus-visible {
+  outline-color: var(--marigold);
+}
+
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.footer-name {
+  margin: 0 0 0.6rem;
+  color: var(--cream);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-stretch: 75%;
+  font-weight: 800;
+  line-height: 0.9;
+}
+
+.footer-sub {
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.75rem;
+}
+
+.site-footer a {
+  color: var(--cream);
+  text-decoration-color: var(--marigold);
+}
+
+.site-footer a:hover {
+  color: var(--marigold);
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(251, 244, 226, 0.15);
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+
+/* ---------- 19. Responsive rules ---------- */
+@media (max-width: 1000px) {
+  .hero-grid,
+  .talk-grid,
+  .about-grid,
+  .case,
+  .wins,
+  .contact-grid,
+  .tab-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ledger {
+    rotate: 0.75deg;
+  }
+
+  .totals-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 2.5rem;
+  }
+
+  .totals-grid li:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .places {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .place,
+  .place:first-child,
+  .place:last-child {
+    padding: 2rem 0 2.25rem;
+    border-left: 0;
+  }
+
+  .place + .place {
+    border-top: 2px solid var(--ink);
+  }
+
+  .index-card {
+    position: static;
+    rotate: 0deg;
+  }
+
+  .meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .meta-grid div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .case-visual {
+    min-height: 14rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .site-header {
+    position: static;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding-top: 0.9rem;
+  }
+
+  /* nav moves to its own row and wraps so every link stays visible */
+  .main-nav {
+    order: 3;
+    width: calc(100% + 1.2rem);
+    margin-inline: -0.6rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .main-nav a {
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 1.125rem;
+  }
+
+  .ledger {
+    padding: 1.4rem 1.1rem 1.2rem;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .ledger-table th:first-child,
+  .ledger-table td:first-child {
+    width: 4.4rem;
+  }
+
+  .ledger-table td {
+    padding-inline: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .story {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meta-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meta-grid div,
+  .meta-grid div:nth-child(3) {
+    padding: 0.75rem 0;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .meta-grid div:first-child {
+    border-top: 0;
+  }
+
+  .overlap {
+    padding: 1.25rem 1rem 1.25rem;
+  }
+
+  .bar {
+    padding: 0.7rem 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  /* the record table becomes stacked entries */
+  .record thead {
+    display: none;
+  }
+
+  .record,
+  .record tbody,
+  .record tr,
+  .record td {
+    display: block;
+  }
+
+  .record tr {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .record tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .record td,
+  .record td:first-child {
+    padding: 0.15rem 0;
+    border: 0;
+    white-space: normal;
+  }
+
+  .record td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--blue);
+    font-family: var(--font-hand);
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .win {
+    padding: 8.5rem 1.4rem 1.75rem;
+  }
+
+  .stamp {
+    top: 1.25rem;
+    right: auto;
+    left: 1.4rem;
+  }
+
+  .slip {
+    padding: 1.5rem 1.25rem 1.75rem;
+    rotate: 0deg;
+  }
+
+  .contact-list div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
+
+  /* tabs become a 2 x 2 grid of buttons on small screens */
+  .tab-labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    margin-bottom: 1rem;
+  }
+
+  .tab-labels label {
+    display: grid;
+    place-items: center;
+    padding: 0.7rem 0.75rem;
+    border-bottom: 2px solid var(--ink);
+    border-radius: 6px;
+    font-size: 0.98rem;
+    text-align: center;
+  }
+
+  #tab-tech:checked ~ .tab-labels label[for="tab-tech"],
+  #tab-creative:checked ~ .tab-labels label[for="tab-creative"],
+  #tab-business:checked ~ .tab-labels label[for="tab-business"],
+  #tab-pro:checked ~ .tab-labels label[for="tab-pro"] {
+    padding-bottom: 0.7rem;
+    background-color: var(--marigold);
+  }
+}
+
+
+/* ---------- 20. Motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
